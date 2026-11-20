@@ -3,9 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <cmath>
-#include <stdexcept>
+#include <cstddef>
 
 namespace miit::algebra
 {
@@ -20,12 +18,12 @@ namespace miit::algebra
 		/**
 		 * @brief Количество строк матрицы
 		 */
-		int rows;
+		size_t rows;
 
 		/**
 		 * @brief Количество столбцов матрицы
 		 */
-		int cols;
+		size_t cols;
 
 		/**
 		 * @brief Двумерный массив данных матрицы
@@ -36,39 +34,27 @@ namespace miit::algebra
 		/**
 		 * @brief Конструктор по умолчанию (создает пустую матрицу 0x0)
 		 */
-		Matrix()
-			: rows(0), cols(0)
-		{
-		}
+		Matrix();
 
 		/**
 		 * @brief Конструктор матрицы заданного размера, заполненной значениями по умолчанию
 		 * @param r Количество строк матрицы
 		 * @param c Количество столбцов матрицы
-		 * @throw std::invalid_argument Если r <= 0 или c <= 0
+		 * @throw std::invalid_argument Если r == 0 или c == 0
 		 */
-		Matrix(const int r, const int c)
-		{
-			if (r <= 0 || c <= 0)
-			{
-				throw std::invalid_argument("Размеры матрицы должны быть больше нуля");
-			}
-			rows = r;
-			cols = c;
-			data.resize(r, std::vector<T>(c, T{}));
-		}
+		Matrix(const size_t r, const size_t c);
 
 		/**
 		 * @brief Конструктор копирования
 		 * @param other Матрица для копирования
 		 */
-		Matrix(const Matrix& other) = default;
+		Matrix(const Matrix& other);
 
 		/**
 		 * @brief Конструктор перемещения
 		 * @param other Перемещаемая матрица
 		 */
-		Matrix(Matrix&& other) noexcept = default;
+		Matrix(Matrix&& other) noexcept;
 
 		/**
 		 * @brief Деструктор матрицы
@@ -80,199 +66,89 @@ namespace miit::algebra
 		 * @param other Матрица для копирования
 		 * @return Ссылка на текущий объект матрицы
 		 */
-		Matrix& operator=(const Matrix& other) = default;
+		Matrix& operator=(const Matrix& other);
 
 		/**
 		 * @brief Оператор перемещающего присваивания
 		 * @param other Перемещаемая матрица
 		 * @return Ссылка на текущий объект матрицы
 		 */
-		Matrix& operator=(Matrix&& other) noexcept = default;
+		Matrix& operator=(Matrix&& other) noexcept;
 
 		/**
 		 * @brief Оператор проверки двух матриц на поэлементное равенство
 		 * @param other Матрица для сравнения
 		 * @return true, если размеры и все соответствующие элементы совпадают, иначе false
 		 */
-		bool operator==(const Matrix& other) const
-		{
-			return data == other.data;
-		}
+		bool operator==(const Matrix& other) const;
 
 		/**
 		 * @brief Оператор проверки двух матриц на неравенство
 		 * @param other Матрица для сравнения
 		 * @return true, если матрицы различаются, иначе false
 		 */
-		bool operator!=(const Matrix& other) const
-		{
-			return !(*this == other);
-		}
+		bool operator!=(const Matrix& other) const;
 
 		/**
 		 * @brief Неконстантный оператор доступа к строке матрицы по индексу
-		 * @param row Индекс строки (поддерживаются отрицательные индексы с конца)
+		 * @param row Индекс строки
 		 * @return Ссылка на вектор элементов строки
-		 * @throw std::invalid_argument Если индекс выходит за границы матрицы
+		 * @throw std::out_of_range Если индекс выходит за границы матрицы
 		 */
-		std::vector<T>& operator[](const int row)
-		{
-			int actualRow = row;
-			if (actualRow < 0)
-			{
-				actualRow += rows;
-			}
-			if (actualRow < 0 || actualRow >= rows)
-			{
-				throw std::invalid_argument("Индекс строки вне диапазона");
-			}
-			return data[actualRow];
-		}
+		std::vector<T>& operator[](const size_t row);
 
 		/**
 		 * @brief Константный оператор доступа к строке матрицы по индексу
-		 * @param row Индекс строки (поддерживаются отрицательные индексы с конца)
+		 * @param row Индекс строки
 		 * @return Константная ссылка на вектор элементов строки
-		 * @throw std::invalid_argument Если индекс выходит за границы матрицы
+		 * @throw std::out_of_range Если индекс выходит за границы матрицы
 		 */
-		const std::vector<T>& operator[](const int row) const
-		{
-			int actualRow = row;
-			if (actualRow < 0)
-			{
-				actualRow += rows;
-			}
-			if (actualRow < 0 || actualRow >= rows)
-			{
-				throw std::invalid_argument("Индекс строки вне диапазона");
-			}
-			return data[actualRow];
-		}
+		const std::vector<T>& operator[](const size_t row) const;
 
 		/**
 		 * @brief Получить количество строк матрицы
 		 * @return Число строк матрицы
 		 */
-		int rowsCount() const
-		{
-			return rows;
-		}
+		size_t rowsCount() const;
 
 		/**
 		 * @brief Получить количество столбцов матрицы
 		 * @return Число столбцов матрицы
 		 */
-		int columnsCount() const
-		{
-			return cols;
-		}
+		size_t columnsCount() const;
 
 		/**
 		 * @brief Найти минимальный элемент матрицы
 		 * @return Константная ссылка на минимальный элемент матрицы
 		 * @throw std::invalid_argument Если матрица пустая
 		 */
-		const T& minimum() const
-		{
-			if (rows == 0 || cols == 0)
-			{
-				throw std::invalid_argument("Матрица пустая");
-			}
-			int minR = 0;
-			int minC = 0;
-			for (int i = 0; i < rows; i++)
-			{
-				for (int j = 0; j < cols; j++)
-				{
-					if (data[i][j] < data[minR][minC])
-					{
-						minR = i;
-						minC = j;
-					}
-				}
-			}
-			return data[minR][minC];
-		}
+		const T& minimum() const;
 
 		/**
 		 * @brief Найти максимальный элемент матрицы
 		 * @return Константная ссылка на максимальный элемент матрицы
 		 * @throw std::invalid_argument Если матрица пустая
 		 */
-		const T& maximum() const
-		{
-			if (rows == 0 || cols == 0)
-			{
-				throw std::invalid_argument("Матрица пустая");
-			}
-			int maxR = 0;
-			int maxC = 0;
-			for (int i = 0; i < rows; i++)
-			{
-				for (int j = 0; j < cols; j++)
-				{
-					if (data[i][j] > data[maxR][maxC])
-					{
-						maxR = i;
-						maxC = j;
-					}
-				}
-			}
-			return data[maxR][maxC];
-		}
+		const T& maximum() const;
 
 		/**
 		 * @brief Найти максимальный по модулю элемент матрицы
 		 * @return Константная ссылка на элемент матрицы с наибольшим значением модуля (|x|)
 		 * @throw std::invalid_argument Если матрица пустая
 		 */
-		const T& maxAbsolute() const
-		{
-			if (rows == 0 || cols == 0)
-			{
-				throw std::invalid_argument("Матрица пустая");
-			}
-			int maxR = 0;
-			int maxC = 0;
-			for (int i = 0; i < rows; i++)
-			{
-				for (int j = 0; j < cols; j++)
-				{
-					if (std::abs(data[i][j]) > std::abs(data[maxR][maxC]))
-					{
-						maxR = i;
-						maxC = j;
-					}
-				}
-			}
-			return data[maxR][maxC];
-		}
+		const T& maxAbsolute() const;
 
 		/**
 		 * @brief Заполнить все элементы матрицы с помощью переданного генератора
 		 * @param generator Объект генератора чисел
 		 */
-		void fill(const Generator& generator)
-		{
-			for (int i = 0; i < rows; i++)
-			{
-				for (int j = 0; j < cols; j++)
-				{
-					data[i][j] = (T)generator.generate();
-				}
-			}
-		}
+		void fill(Generator& generator);
 
 		/**
 		 * @brief Преобразовать матрицу в строку
 		 * @return Строка с элементами матрицы, разделенными табуляцией
 		 */
-		std::string toString() const
-		{
-			std::ostringstream ss;
-			ss << *this;
-			return ss.str();
-		}
+		std::string toString() const;
 
 		/**
 		 * @brief Дружественный оператор вывода матрицы в поток
@@ -282,9 +158,9 @@ namespace miit::algebra
 		 */
 		friend std::ostream& operator<<(std::ostream& out, const Matrix<T>& mat)
 		{
-			for (int i = 0; i < mat.rows; i++)
+			for (size_t i = 0; i < mat.rows; i++)
 			{
-				for (int j = 0; j < mat.cols; j++)
+				for (size_t j = 0; j < mat.cols; j++)
 				{
 					out << mat.data[i][j];
 					if (j + 1 < mat.cols)
@@ -305,9 +181,9 @@ namespace miit::algebra
 		 */
 		friend std::istream& operator>>(std::istream& in, Matrix<T>& mat)
 		{
-			for (int i = 0; i < mat.rows; i++)
+			for (size_t i = 0; i < mat.rows; i++)
 			{
-				for (int j = 0; j < mat.cols; j++)
+				for (size_t j = 0; j < mat.cols; j++)
 				{
 					in >> mat.data[i][j];
 				}
@@ -318,5 +194,5 @@ namespace miit::algebra
 
 	// Руководства по дедукции аргументов шаблона (CTAD)
 	Matrix() -> Matrix<int>;
-	Matrix(int, int) -> Matrix<int>;
+	Matrix(size_t, size_t) -> Matrix<int>;
 }
