@@ -1,16 +1,13 @@
-#include "../include/IStreamGenerator.h"
+#include "IStreamGenerator.h"
 
-namespace miit::algebra
+miit::algebra::IStreamGenerator::IStreamGenerator(std::istream& in)
+	: in{in}
 {
-	IStreamGenerator::IStreamGenerator(std::istream& stream)
-		: in(stream)
-	{
-	}
+}
 
-	int IStreamGenerator::generate() const
-	{
-		int val = 0;
-		in >> val;
-		return val;
-	}
+int miit::algebra::IStreamGenerator::generate()
+{
+	int value = 0;
+	this->in >> value;
+	return value;
 }
