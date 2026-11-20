@@ -191,8 +191,4 @@ namespace miit::algebra
 			return in;
 		}
 	};
-
-	// Руководства по дедукции аргументов шаблона (CTAD)
-	Matrix() -> Matrix<int>;
-	Matrix(size_t, size_t) -> Matrix<int>;
 }
